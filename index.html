@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comic Page Composer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="logo-mark">CC</div>
+    <div class="header-text">
+      <h1>Comic Page Composer</h1>
+      <p>Upload panels &rarr; Add dialogue or narration &rarr; Generate page &rarr; Fine-tune &rarr; Export</p>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <section class="control-area">
+
+    <div class="section-block">
+      <h2>Your Panels</h2>
+      <p class="section-hint">Upload each panel's artwork, choose whether it's Dialogue or Narration, and add the text.</p>
+      <div id="panelList" class="panel-list"></div>
+      <button id="addPanelBtn" class="btn btn-secondary btn-block">+ Add Panel</button>
+      <p id="panelLimitMsg" class="limit-msg" hidden>Maximum 10 panels</p>
+    </div>
+
+    <div class="section-block">
+      <h2>Page Settings</h2>
+      <div class="settings-grid">
+
+        <label class="setting setting-wide">
+          <span>Page Size</span>
+          <select id="settingPageSize">
+            <optgroup label="Standard ISO">
+              <option value="A4" selected>A4 — 210 × 297 mm</option>
+              <option value="A5">A5 — 148 × 210 mm</option>
+              <option value="A3">A3 — 297 × 420 mm</option>
+              <option value="B5">B5 — 176 × 250 mm</option>
+              <option value="B4">B4 — 250 × 353 mm</option>
+            </optgroup>
+            <optgroup label="Comic / Graphic Novel">
+              <option value="6x9">6 × 9 in</option>
+              <option value="7x10">7 × 10 in</option>
+              <option value="6.625x10.25">6.625 × 10.25 in</option>
+              <option value="6.5x10">6.5 × 10 in</option>
+              <option value="7.5x10">7.5 × 10 in</option>
+              <option value="8x10">8 × 10 in</option>
+              <option value="8.5x11">8.5 × 11 in</option>
+            </optgroup>
+            <optgroup label="Custom">
+              <option value="custom">Custom Size&hellip;</option>
+            </optgroup>
+          </select>
+        </label>
+
+        <div class="setting setting-wide" id="customSizeRow" hidden>
+          <span>Custom Dimensions</span>
+          <div class="custom-size-row">
+            <input type="number" id="customWidth" min="1" step="0.1" placeholder="Width" value="6">
+            <span class="x-sep">&times;</span>
+            <input type="number" id="customHeight" min="1" step="0.1" placeholder="Height" value="9">
+            <select id="customUnit">
+              <option value="in" selected>in</option>
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+            </select>
+          </div>
+        </div>
+
+        <p id="selectedSizeInfo" class="selected-size-info setting-wide"></p>
+
+        <label class="setting">
+          <span>Orientation</span>
+          <select id="settingOrientation">
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
+          </select>
+        </label>
+
+        <label class="setting">
+          <span>Layout</span>
+          <select id="settingLayoutStyle">
+            <option value="balanced">Balanced</option>
+            <option value="cinematic">Cinematic</option>
+            <option value="classic">Classic</option>
+            <option value="grid">Grid</option>
+          </select>
+        </label>
+
+        <label class="setting">
+          <span>Panel Borders</span>
+          <select id="settingBorderStyle">
+            <option value="none">None</option>
+            <option value="thin" selected>Thin</option>
+            <option value="medium">Medium</option>
+            <option value="thick">Thick</option>
+          </select>
+        </label>
+
+        <label class="setting">
+          <span>Background</span>
+          <select id="settingBackground">
+            <option value="#ffffff" selected>White</option>
+            <option value="#000000">Black</option>
+            <option value="custom">Custom</option>
+          </select>
+        </label>
+
+        <label class="setting" id="customBgWrap" hidden>
+          <span>Custom Color</span>
+          <input type="color" id="settingCustomBg" value="#ffffff">
+        </label>
+
+        <label class="setting">
+          <span>Default Comic Font</span>
+          <select id="settingDefaultFont">
+            <option value="Comic Sans MS, Comic Neue, cursive" selected>Comic (Comic Neue / Comic Sans)</option>
+            <option value="Bangers, Arial, sans-serif">Bangers-style Display</option>
+            <option value="Arial, sans-serif">Arial (Clean)</option>
+            <option value="Georgia, serif">Georgia (Classic)</option>
+            <option value="Courier New, monospace">Courier (Typewriter)</option>
+          </select>
+        </label>
+
+        <label class="setting">
+          <span>Default Font Size (pt)</span>
+          <select id="settingDefaultFontSize">
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8" selected>8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+          </select>
+        </label>
+
+      </div>
+    </div>
+
+    <div class="section-block actions-block">
+      <button id="generateBtn" class="btn btn-primary btn-block">Generate Comic Page</button>
+      <div class="export-row">
+        <button id="exportPngBtn" class="btn btn-outline">Export PNG</button>
+        <button id="exportJpgBtn" class="btn btn-outline">Export JPEG</button>
+      </div>
+      <p id="statusMsg" class="status-msg"></p>
+    </div>
+
+  </section>
+
+  <section class="preview-area">
+
+    <div class="preview-area-header">
+      <h2>Page Editor</h2>
+      <span id="modeIndicator" class="mode-indicator">Not generated yet</span>
+    </div>
+
+    <div class="editor-toolbar" id="editorToolbar" hidden>
+      <div class="toolbar-group">
+        <button id="undoBtn" class="btn btn-outline btn-small" title="Undo (Ctrl+Z)">&#8630; Undo</button>
+        <button id="redoBtn" class="btn btn-outline btn-small" title="Redo (Ctrl+Shift+Z)">&#8631; Redo</button>
+      </div>
+      <div class="toolbar-group">
+        <label class="inline-setting">
+          <span>View</span>
+          <select id="editorZoom">
+            <option value="0.4">40%</option>
+            <option value="0.5" selected>50%</option>
+            <option value="0.65">65%</option>
+            <option value="0.8">80%</option>
+            <option value="1">100%</option>
+          </select>
+        </label>
+      </div>
+      <div class="toolbar-group">
+        <label class="inline-setting safe-mode-toggle">
+          <input type="checkbox" id="safeModeToggle" checked>
+          <span>Character Safe Mode</span>
+        </label>
+      </div>
+      <div class="toolbar-group">
+        <button id="resetLayoutBtn" class="btn btn-outline btn-small">Reset Layout</button>
+      </div>
+    </div>
+
+    <div class="editor-body">
+      <div class="preview-stage" id="previewStage">
+        <div id="previewEmptyState" class="preview-empty">
+          <p>Your comic page will appear here.</p>
+          <p class="preview-empty-sub">Add your panels and click Generate to begin.</p>
+        </div>
+        <div id="editorStageWrap" class="editor-stage-wrap" hidden>
+          <div id="editorPage" class="editor-page"></div>
+        </div>
+      </div>
+
+      <aside id="propertiesPanel" class="properties-panel" hidden>
+        <div id="propertiesContent"></div>
+      </aside>
+    </div>
+
+  </section>
+
+</main>
+
+<canvas id="exportCanvas" hidden></canvas>
+
+<div id="drawModal" class="draw-modal" hidden>
+  <div class="draw-modal-inner">
+    <div class="draw-modal-header">
+      <h3>Draw Artwork</h3>
+      <button id="drawCloseBtn" type="button" class="btn btn-outline btn-small" title="Cancel">Cancel</button>
+    </div>
+    <div class="draw-modal-body">
+      <div class="draw-toolbar">
+        <div class="draw-tool-group">
+          <span class="field-label">Tool</span>
+          <div class="draw-tool-buttons">
+            <button type="button" class="draw-tool-btn active" data-tool="pencil">Pencil</button>
+            <button type="button" class="draw-tool-btn" data-tool="brush">Brush</button>
+            <button type="button" class="draw-tool-btn" data-tool="eraser">Eraser</button>
+          </div>
+        </div>
+        <div class="draw-tool-group">
+          <span class="field-label">Assisted Shapes</span>
+          <div class="draw-tool-buttons">
+            <button type="button" class="draw-tool-btn" data-tool="line">Line</button>
+            <button type="button" class="draw-tool-btn" data-tool="rect">Rectangle</button>
+            <button type="button" class="draw-tool-btn" data-tool="ellipse">Ellipse / Circle</button>
+          </div>
+        </div>
+        <div class="draw-tool-group">
+          <span class="field-label">Color</span>
+          <input type="color" id="drawColor" value="#1c1b1a">
+        </div>
+        <div class="draw-tool-group">
+          <span class="field-label" id="drawSizeLabel">Size (4px)</span>
+          <input type="range" id="drawSize" min="1" max="60" value="4">
+        </div>
+        <div class="draw-tool-group">
+          <span class="field-label">Canvas Background</span>
+          <input type="color" id="drawBgColor" value="#ffffff">
+        </div>
+        <div class="draw-tool-group draw-actions">
+          <button id="drawUndoBtn" type="button" class="btn btn-outline btn-small">&#8630; Undo</button>
+          <button id="drawRedoBtn" type="button" class="btn btn-outline btn-small">&#8631; Redo</button>
+          <button id="drawClearBtn" type="button" class="btn btn-outline btn-small">Clear</button>
+        </div>
+      </div>
+      <div class="draw-canvas-wrap">
+        <canvas id="drawCanvas" width="900" height="650"></canvas>
+      </div>
+    </div>
+    <div class="draw-modal-footer">
+      <button id="drawApplyBtn" type="button" class="btn btn-primary">Apply Drawing</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
